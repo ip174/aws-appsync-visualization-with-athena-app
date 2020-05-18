@@ -1,0 +1,15 @@
+{
+    "devf": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-aws-appsync-with-athena-app-devf-03353-authRole",
+            "UnauthRoleArn": "arn:aws:iam::814285065359:role/amplify-aws-appsync-with-athena-app-devf-03353-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::814285065359:role/amplify-aws-appsync-with-athena-app-devf-03353-authRole",
+            "Region": "eu-west-1",
+            "DeploymentBucketName": "amplify-aws-appsync-with-athena-app-devf-03353-deployment",
+            "UnauthRoleName": "amplify-aws-appsync-with-athena-app-devf-03353-unauthRole",
+            "StackName": "amplify-aws-appsync-with-athena-app-devf-03353",
+            "StackId": "arn:aws:cloudformation:eu-west-1:814285065359:stack/amplify-aws-appsync-with-athena-app-devf-03353/ebf587c0-970c-11ea-976d-0aac29486886",
+            "AmplifyAppId": "d1k50hs3qecxrj"
+        }
+    }
+}
