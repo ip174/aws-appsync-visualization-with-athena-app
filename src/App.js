@@ -17,21 +17,14 @@ import * as d3 from "d3";
 import moment from "moment";
 
 import awsconfig from "./aws-exports";
-// import { drawChart } from "./hexabin-helper";
 import { Bar } from "react-chartjs-2";
-
-// import CanvasJSReact from "./assets/canvasjs.react";
-// //var CanvasJSReact = require('./canvasjs.react');
-// var CanvasJS = CanvasJSReact.CanvasJS;
-// var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-
 Amplify.configure(awsconfig);
 
 const App = () => {
   const [user, setUser] = useState(null);
-  let [data, setData] = useState([]);
   let [styles, setStyles] = useState({ display: "none" });
   let [messageUpload, setMessageUpload] = useState();
+  let [dataStats, setDataStats] = useState();
 
   // get current user
   useEffect(() => {
@@ -48,75 +41,6 @@ const App = () => {
     Auth.signOut()
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
-  };
-
-  const dataEx = {
-    labels: ["2015", "2016", "2017", "2018", "2019"],
-    datasets: [
-      {
-        label: "North America",
-        backgroundColor: "rgba(255,99,132,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(255,99,132,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [605529596, 651023883, 776728053, 775201195, 781622211],
-      },
-      {
-        label: "Europe",
-        backgroundColor: "rgba(122,23,121,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(205,99,132,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [5374823247, 5936760647, 6348673128, 5894956411, 6052135698],
-      },
-      {
-        label: "of which EU",
-        backgroundColor: "rgba(255,242,100,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(12,9,201,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [396704115, 4272672514, 4673214954, 428995736, 4253431269],
-      },
-      {
-        label: "of which EU15",
-        backgroundColor: "rgba(20,101,190,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [396704115, 4272672514, 4673214954, 428995736, 4253431269],
-      },
-      {
-        label: "of which OtherEU",
-        backgroundColor: "rgba(20,232,2,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [942881407, 1163511429, 1118772447, 1171126536, 1334933273],
-      },
-      {
-        label: "Other Countries",
-        backgroundColor: "rgba(43,10,90,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [968273372, 963189718, 1181554291, 1213021041, 1123534255],
-      },
-      {
-        label: "Total World",
-        backgroundColor: "rgba(0,0,0,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [6948626215, 7550974248, 8306955472, 7883178647, 7957292164],
-      },
-    ],
   };
 
   const dataPrediction = {
@@ -190,72 +114,137 @@ const App = () => {
 
   const uploadFile = async (e) => {
     const file = e.target.files[0];
-    const rawData = Object.assign(
-      await d3.csv(
-        "/uktraveldata.csv",
-        ({ Year, Europe, America, Other, EU15 }) => ({
-          Year: Year,
-          Europe: parseFloat(Europe),
-          America: parseFloat(America),
-          Other: parseFloat(Other),
-          EU15: parseFloat(EU15),
-        })
-      )
-    );
-    data.labels = rawData.columns;
 
-    let america,
-      europe = [];
+    let tmp_america = [];
+    let tmp_europe = [];
+    let tmp_eu = [];
+    let tmp_eu15 = [];
+    let tmp_othereu = [];
+    let tmp_other = [];
+    let tmp_total = [];
 
-    let tmp_arr = [];
-
-    rawData.forEach(function (item) {
-      for (let key in item) {
-        if (key === "Europe") {
-          tmp_arr.push(item[key]);
-          // console.log(item[key]);
-          europe = {
-            label: "Europe",
-            backgroundColor: "rgba(255,99,132,0.2)",
-            borderColor: "rgba(201, 201, 201)",
-            borderWidth: 1,
-            hoverBackgroundColor: "rgba(255,99,132,0.8)",
-            hoverBorderColor: "rgba(201, 201, 201)",
-            // data: [584088736, 30408874],
-            // data: item[key],
-          };
-        }
-        if (key === "America") {
-          // tmp_arr.push(item[key]);
-          // console.log(item[key]);
-          america = {
-            label: "America",
-            backgroundColor: "rgba(255,99,132,0.2)",
-            borderColor: "rgba(201, 201, 201)",
-            borderWidth: 1,
-            hoverBackgroundColor: "rgba(255,99,132,0.8)",
-            hoverBorderColor: "rgba(201, 201, 201)",
-            // data: [584088736, 30408874],
-            // data: item[key],
-          };
+    await d3.csv(file.name, function (data) {
+      if (data.country !== "" && data.tourists !== "") {
+        if (data.country === "America") {
+          tmp_america.push(data.tourists);
+        } else if (data.country === "Europe") {
+          tmp_europe.push(data.tourists);
+        } else if (data.country === "EU") {
+          tmp_eu.push(data.tourists);
+        } else if (data.country === "EU15") {
+          tmp_eu15.push(data.tourists);
+        } else if (data.country === "OtherEU") {
+          tmp_othereu.push(data.tourists);
+        } else if (data.country === "Other") {
+          tmp_other.push(data.tourists);
+        } else if (data.country === "Total") {
+          tmp_total.push(data.tourists);
         }
       }
     });
 
-    let tmp = {
-      datasets: [europe, america],
-    };
-    tmp.labels = rawData.labels;
-    setData(tmp);
+    let data = getData(
+      tmp_america.map(Number),
+      tmp_europe.map(Number),
+      tmp_eu.map(Number),
+      tmp_eu15.map(Number),
+      tmp_othereu.map(Number),
+      tmp_other.map(Number),
+      tmp_total.map(Number)
+    );
+
+    console.log(data);
+    console.log(dataPrediction);
+
+    setDataStats(data);
 
     Storage.put(file.name, file)
       .then((result) => {
-        let resp = file.name + " was succesfully uploaded to S3";
+        let resp = file.name + " was succesfully uploaded to S3...";
         // console.log("Uploaded to S3: ", result);
         setMessageUpload(resp);
         setStyles({ display: "block" });
       })
       .catch((err) => console.log(err));
+  };
+
+  let getData = (
+    dataAmerica,
+    dataEurope,
+    dataEu,
+    dataEU15,
+    dataOtherEU,
+    dataOther,
+    dataTotal
+  ) => {
+    return {
+      labels: ["2016", "2017", "2018", "2019"],
+      datasets: [
+        {
+          label: "America",
+          backgroundColor: "rgba(255,99,132,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(255,99,132,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataAmerica,
+        },
+        {
+          label: "Europe",
+          backgroundColor: "rgba(122,23,121,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(205,99,132,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataEurope,
+        },
+        {
+          label: "EU",
+          backgroundColor: "rgba(255,242,100,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(12,9,201,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataEu,
+        },
+        {
+          label: "EU15",
+          backgroundColor: "rgba(20,101,190,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataEU15,
+        },
+        {
+          label: "OtherEU",
+          backgroundColor: "rgba(20,232,2,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataOtherEU,
+        },
+        {
+          label: "Other",
+          backgroundColor: "rgba(43,10,90,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataOther,
+        },
+        {
+          label: "Total",
+          backgroundColor: "rgba(0,0,0,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: dataTotal,
+        },
+      ],
+    };
   };
 
   return (
@@ -293,28 +282,14 @@ const App = () => {
         <Row className="mt-5 charData" style={styles}>
           <Col>
             <h2>UK Current Travel Stats</h2>
-            <Bar
-              data={dataEx}
-              width={100}
-              height={40}
-              // options={{
-              //   maintainAspectRatio: false,
-              // }}
-            />
+            <Bar data={dataStats} width={100} height={40} />
           </Col>
         </Row>
 
         <Row className="mt-5 charData" style={styles}>
           <Col>
             <h2>UK Prediction for 2021</h2>
-            <Bar
-              data={dataPrediction}
-              width={100}
-              height={40}
-              // options={{
-              //   maintainAspectRatio: false,
-              // }}
-            />
+            <Bar data={dataPrediction} width={100} height={40} />
           </Col>
         </Row>
       </Container>
