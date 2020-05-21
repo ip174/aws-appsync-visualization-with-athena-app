@@ -25,6 +25,7 @@ const App = () => {
   let [styles, setStyles] = useState({ display: "none" });
   let [messageUpload, setMessageUpload] = useState();
   let [dataStats, setDataStats] = useState();
+  let [dataPrediction, setDataPrediction] = useState();
 
   // get current user
   useEffect(() => {
@@ -41,75 +42,6 @@ const App = () => {
     Auth.signOut()
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
-  };
-
-  const dataPrediction = {
-    labels: ["January 2021", "February 2021", "March 2021"],
-    datasets: [
-      {
-        label: "North America",
-        backgroundColor: "rgba(255,99,132,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(255,99,132,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [305529596, 351023883, 676728053, 375201195, 81622211],
-      },
-      {
-        label: "Europe",
-        backgroundColor: "rgba(122,23,121,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(205,99,132,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [2374823247, 6336760647, 4448673128, 3494956411, 3452135698],
-      },
-      {
-        label: "of which EU",
-        backgroundColor: "rgba(255,242,100,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(12,9,201,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [116704115, 1272672514, 3273214954, 238995736, 3353431269],
-      },
-      {
-        label: "of which EU15",
-        backgroundColor: "rgba(20,101,190,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [396704115, 4272672514, 4673214954, 428995736, 4253431269],
-      },
-      {
-        label: "of which OtherEU",
-        backgroundColor: "rgba(20,232,2,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [942881407, 1163511429, 1118772447, 1171126536, 1334933273],
-      },
-      {
-        label: "Other Countries",
-        backgroundColor: "rgba(43,10,90,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [368273372, 263189718, 5181554291, 4213021041, 1123534255],
-      },
-      {
-        label: "Total World",
-        backgroundColor: "rgba(0,0,0,0.2)",
-        borderColor: "rgba(201, 201, 201)",
-        borderWidth: 1,
-        hoverBackgroundColor: "rgba(222,99,221,0.8)",
-        hoverBorderColor: "rgba(201, 201, 201)",
-        data: [3348626215, 2550974248, 3306955472, 5883178647, 1957292164],
-      },
-    ],
   };
 
   const uploadFile = async (e) => {
@@ -153,15 +85,22 @@ const App = () => {
       tmp_total.map(Number)
     );
 
-    console.log(data);
-    console.log(dataPrediction);
+    let predictionData = getPredictionData(
+      tmp_america.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_europe.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_eu.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_eu15.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_othereu.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_other.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length,
+      tmp_total.map(Number).reduce((a, b) => a + b, 0) / tmp_america.length
+    );
 
     setDataStats(data);
+    setDataPrediction(predictionData);
 
     Storage.put(file.name, file)
       .then((result) => {
         let resp = file.name + " was succesfully uploaded to S3...";
-        // console.log("Uploaded to S3: ", result);
         setMessageUpload(resp);
         setStyles({ display: "block" });
       })
@@ -242,6 +181,85 @@ const App = () => {
           hoverBackgroundColor: "rgba(222,99,221,0.8)",
           hoverBorderColor: "rgba(201, 201, 201)",
           data: dataTotal,
+        },
+      ],
+    };
+  };
+
+  let getPredictionData = (
+    dataAmerica,
+    dataEurope,
+    dataEu,
+    dataEU15,
+    dataOtherEU,
+    dataOther,
+    dataTotal
+  ) => {
+    return {
+      labels: ["+1", "+2", "+3"],
+      datasets: [
+        {
+          label: "America",
+          backgroundColor: "rgba(255,99,132,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(255,99,132,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataAmerica],
+        },
+        {
+          label: "Europe",
+          backgroundColor: "rgba(122,23,121,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(205,99,132,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataEurope],
+        },
+        {
+          label: "EU",
+          backgroundColor: "rgba(255,242,100,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(12,9,201,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataEu],
+        },
+        {
+          label: "EU15",
+          backgroundColor: "rgba(20,101,190,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataEU15],
+        },
+        {
+          label: "OtherEU",
+          backgroundColor: "rgba(20,232,2,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataOtherEU],
+        },
+        {
+          label: "Other",
+          backgroundColor: "rgba(43,10,90,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataOther],
+        },
+        {
+          label: "Total",
+          backgroundColor: "rgba(0,0,0,0.2)",
+          borderColor: "rgba(201, 201, 201)",
+          borderWidth: 1,
+          hoverBackgroundColor: "rgba(222,99,221,0.8)",
+          hoverBorderColor: "rgba(201, 201, 201)",
+          data: [dataTotal],
         },
       ],
     };
