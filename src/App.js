@@ -12,12 +12,11 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-
 import * as d3 from "d3";
 import moment from "moment";
-
 import awsconfig from "./aws-exports";
 import { Bar } from "react-chartjs-2";
+
 Amplify.configure(awsconfig);
 
 const App = () => {
@@ -267,14 +266,18 @@ const App = () => {
 
   return (
     <>
-      <Container className="mb-5">
-        <Navbar bg="dark" variant="dark">
-          <Navbar.Brand href="#home">TravData</Navbar.Brand>
+      <Container className="mb-5 main-box pb-5">
+        <Navbar bg="light" variant="dark" className="border-bottom">
+          <Navbar.Brand href="#home">
+            <img src="/logobg.png" width="125" />
+          </Navbar.Brand>
           <Nav className="mr-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="#home" className="text-dark">
+              Home
+            </Nav.Link>
           </Nav>
           <Form inline>
-            <Button variant="btn" className="text-white" onClick={signOut}>
+            <Button variant="btn" className="text-dark" onClick={signOut}>
               Logout
             </Button>
           </Form>
@@ -296,17 +299,21 @@ const App = () => {
             </Form>
           </Col>
         </Row>
-
-        <Row className="mt-5 charData" style={styles}>
+        <Row>
           <Col>
-            <h2>UK Current Travel Stats</h2>
+            <hr />
+          </Col>
+        </Row>
+        <Row className="mt-3 charData" style={styles}>
+          <Col>
+            <h2>Travel Stats</h2>
             <Bar data={dataStats} width={100} height={40} />
           </Col>
         </Row>
 
         <Row className="mt-5 charData" style={styles}>
           <Col>
-            <h2>UK Prediction for 2021</h2>
+            <h2>Future Predictions</h2>
             <Bar data={dataPrediction} width={100} height={40} />
           </Col>
         </Row>

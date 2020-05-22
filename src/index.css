@@ -1,3 +1,8 @@
 #chartData {
   dispay: none;
 }
+
+.main-box {
+  background: #f8f9fa !important;
+  min-height: 70vh;
+}
