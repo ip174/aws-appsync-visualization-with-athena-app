@@ -264,9 +264,13 @@ const App = () => {
     };
   };
 
+  let styleMainBox = {
+    background: "#f8f9fa",
+  };
+
   return (
     <>
-      <Container className="mb-5 main-box pb-5">
+      <Container className="mb-5 main-box pb-5" style={styleMainBox}>
         <Navbar bg="light" variant="dark" className="border-bottom">
           <Navbar.Brand href="#home">
             <img src="/logobg.png" width="125" />
