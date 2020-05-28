@@ -317,7 +317,7 @@ const App = () => {
 
         <Row className="mt-5 charData" style={styles}>
           <Col>
-            <h2>Future Predictions</h2>
+            <h2>Future Predictions - Number in 000's</h2>
             <Bar data={dataPrediction} width={100} height={40} />
           </Col>
         </Row>
